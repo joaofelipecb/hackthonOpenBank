@@ -44,7 +44,7 @@ def request_consent(banficoConsent):
     nonce = 1440569813538
     exp = int((datetime.datetime.now() + datetime.timedelta(hours=1)).astimezone(datetime.timezone.utc).timestamp())
     iat = int(datetime.datetime.now().astimezone(datetime.timezone.utc).timestamp())
-    param = {'response_type':'code','client_id':banficoAuth.clientId,'redirect_uri':'','scope':'openid profile email accounts','state':state,'nonce':nonce}
+    param = {'response_type':'code','client_id':banficoAuth.clientId,'redirect_uri':'https://developer.obiebank.banfico.com/callback','scope':'openid profile email accounts','state':state,'nonce':nonce}
     requestHeader = {'alg': 'RS256','typ': 'JWT'}
     requestPayload = {'aud': 'https://auth.obiebank.banfico.com/auth/realms/provider',
                       'iss': banficoAuth.clientId,
@@ -88,4 +88,9 @@ def request_consent(banficoConsent):
     print(url+'?'+urlencode(param))
     #response = requests.get(url, parms = param)
     #return response
-    
+
+def authenticate_by_code(banficoAuth, code):
+    url = 'https://auth.obiebank.banfico.com/auth/realms/provider/protocol/openid-connect/token'
+    payload = {'grant_type':'authorization_code','code':code,'client_id':banficoAuth.clientId,'client_secret':banficoAuth.clientSecret,'redirect_uri':'https://developer.obiebank.banfico.com/callback'}
+    response = requests.post(url, data=payload)
+    return response

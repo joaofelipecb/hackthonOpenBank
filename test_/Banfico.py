@@ -83,7 +83,12 @@ def request_consent_happy():
                 return False
             else:
                 control_.Banfico.request_consent(banficoConsent)
-            return True
+                code = input()
+                banficoAuth = control_.Banfico.authenticate_by_code(banficoAuth, code)
+                if not isinstance(banficoAuth,develop_.BanficoAuthValid):
+                    return False
+                else:
+                    return True
     except Exception as err:
         raise err
         print(err)

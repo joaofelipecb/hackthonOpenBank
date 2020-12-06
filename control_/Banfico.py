@@ -33,3 +33,9 @@ def get_user_accounts(banficoConsent):
         raise except_.BanficoResponse(response.status_code)
     return response.json()
     
+def get_account_transactions(banficoConsent, banficoAccount):
+    response = command_.Banfico.get_account_transactions(banficoConsent, banficoAccount)
+    if response.status_code != 200:
+        raise except_.BanficoResponse(response.status_code)
+    return response.json()    
+    

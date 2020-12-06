@@ -110,3 +110,12 @@ def get_user_accounts(banficoConsent):
     headers = {'x-fapi-financial-id':banficoConsent.financialId, 'Authorization':bearer}
     response = requests.get(url, headers=headers)
     return response
+
+def get_account_transactions(banficoConsent, banficoAccount):
+    url = 'https://gw-dev.obiebank.banfico.com/obie-aisp/v3.1/aisp/accounts/' + banficoAccount.accountId + '/transactions'
+    financialId = banficoConsent.financialId
+    bearer = 'Bearer ' + banficoConsent.banficoAuthConsent.bearer
+    headers = {'x-fapi-financial-id':banficoConsent.financialId, 'Authorization':bearer}
+    response = requests.get(url, headers=headers)
+    return response
+    

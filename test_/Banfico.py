@@ -151,6 +151,39 @@ def get_user_accounts_happy():
         raise err
         print(err)
         return False
+        
+def get_account_transaction_happy():
+    try:
+        banficoAuth = data_.Banfico.get_credentials()
+        banficoAuth = control_.Banfico.authenticate(banficoAuth)
+        if not isinstance(banficoAuth,develop_.BanficoAuthValid):
+            return False
+        else:
+            financialId = '5fcc3d68b01ef2001da27048';
+            permissions = ['ReadAccountsBasic', 'ReadAccountsDetail', 'ReadBalances', 'ReadBeneficiariesDetail',
+                            'ReadDirectDebits', 'ReadProducts', 'ReadStandingOrdersDetail', 'ReadTransactionsCredits',
+                            'ReadTransactionsDebits', 'ReadTransactionsDetail', 'ReadOffers', 'ReadPAN', 'ReadParty',
+                            'ReadPartyPSU', 'ReadScheduledPaymentsDetail', 'ReadStatementsDetail']
+            banficoConsentRequest = control_.Banfico.create_access_consents(banficoAuth, financialId, permissions)
+            if not isinstance(banficoConsentRequest,develop_.BanficoConsentRequestValid):
+                return False
+            else:
+                url = control_.Banfico.request_consent(banficoConsentRequest)
+                print(url)
+                code = input()
+                banficoConsent = control_.Banfico.authenticate_by_code(banficoConsentRequest, code)
+                if not isinstance(banficoConsent,develop_.BanficoConsentValid):
+                    return False
+                else:
+                    accounts = data_.Banfico.get_user_accounts(banficoConsent)
+                    account = accounts[0]
+                    transaction = data_.Banfico.get_account_transactions(banficoConsent, account)
+                    print(transaction)
+                    return True
+    except Exception as err:
+        raise err
+        print(err)
+        return False
     
 '''if authenticate_happy():
     print("Banfico Auth Happy: ok")
@@ -180,9 +213,14 @@ else:
 if request_consent_raise():
     print("Banfico Request Consent Raise: ok")
 else:
-    print("Banfico Request Consent Raise: ERROR")'''
+    print("Banfico Request Consent Raise: ERROR")
     
 if get_user_accounts_happy():
+    print("Banfico Get User Accounts Happy: ok")
+else:
+    print("Banfico Get User Accounts Happy: ERROR")'''
+    
+if get_account_transaction_happy():
     print("Banfico Get User Accounts Happy: ok")
 else:
     print("Banfico Get User Accounts Happy: ERROR")

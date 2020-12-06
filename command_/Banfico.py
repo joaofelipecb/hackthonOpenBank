@@ -33,13 +33,13 @@ def create_access_consents(banficoAuth, financialId, permissions):
     response = requests.post(url, headers=headers, data=json.dumps(payload))
     return response
     
-def consent(banficoAuth, financialId, response):
+def get_consent_request(banficoAuth, financialId, response):
     json = response.json()
-    return develop_.BanficoConsentValid(banficoAuth, financialId, json['Data']['ConsentId'])
+    return develop_.BanficoConsentRequestValid(banficoAuth, financialId, json['Data']['ConsentId'])
     
-def request_consent(banficoConsent):
+def request_consent(banficoConsentRequest):
     url = 'https://auth.obiebank.banfico.com/auth/realms/provider/protocol/openid-connect/auth'
-    banficoAuth = banficoConsent.banficoAuth
+    banficoAuth = banficoConsentRequest.banficoAuth
     state = 1224489742391
     nonce = 1440569813538
     exp = int((datetime.datetime.now() + datetime.timedelta(hours=1)).astimezone(datetime.timezone.utc).timestamp())
@@ -58,13 +58,13 @@ def request_consent(banficoConsent):
                       'claims': {
                                  'userinfo': {
                                               'openbanking_intent_id': {
-                                                                        'value': 'urn:obiebank:accounts:' + banficoConsent.consentId,
+                                                                        'value': 'urn:obiebank:accounts:' + banficoConsentRequest.consentId,
                                                                         'essential': True
                                                                         }
                                 },
                                 'id_token': {
                                              'openbanking_intent_id': {
-                                                                       'value': 'urn:obiebank:accounts:' + banficoConsent.consentId,
+                                                                       'value': 'urn:obiebank:accounts:' + banficoConsentRequest.consentId,
                                                                        'essential': True
                                                                       },
                                              'acr': {
@@ -85,12 +85,28 @@ def request_consent(banficoConsent):
     pkey = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, key)
     sign = OpenSSL.crypto.sign(pkey, param['request'], "sha256") 
     param['request'] = param['request'] + '.'.encode('ascii') + base64.urlsafe_b64encode(sign)
-    print(url+'?'+urlencode(param))
-    #response = requests.get(url, parms = param)
-    #return response
+    url = url+'?'+urlencode(param)
+    return url
 
-def authenticate_by_code(banficoAuth, code):
+def authenticate_by_code(banficoConsentRequest, code):
     url = 'https://auth.obiebank.banfico.com/auth/realms/provider/protocol/openid-connect/token'
+    banficoAuth = banficoConsentRequest.banficoAuth
     payload = {'grant_type':'authorization_code','code':code,'client_id':banficoAuth.clientId,'client_secret':banficoAuth.clientSecret,'redirect_uri':'https://developer.obiebank.banfico.com/callback'}
     response = requests.post(url, data=payload)
+    return response
+    
+def bearer_consent(banficoConsentRequest, response):
+    json = response.json()
+    banficoAuth = banficoConsentRequest.banficoAuth
+    financialId = banficoConsentRequest.financialId
+    consentId = banficoConsentRequest.consentId
+    banficoAuthConsent = develop_.BanficoAuthValid(banficoAuth.clientId,banficoAuth.clientSecret,json['access_token'])
+    return develop_.BanficoConsentValid(banficoAuth, banficoAuthConsent, financialId, consentId)
+    
+def get_user_accounts(banficoConsent):
+    url = 'https://gw-dev.obiebank.banfico.com/obie-aisp/v3.1/aisp/accounts'
+    financialId = banficoConsent.financialId
+    bearer = 'Bearer ' + banficoConsent.banficoAuthConsent.bearer
+    headers = {'x-fapi-financial-id':banficoConsent.financialId, 'Authorization':bearer}
+    response = requests.get(url, headers=headers)
     return response

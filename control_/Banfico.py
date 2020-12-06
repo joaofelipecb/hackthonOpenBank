@@ -13,15 +13,23 @@ def create_access_consents(banficoAuth, financialId, permissions):
     response = command_.Banfico.create_access_consents(banficoAuth, financialId, permissions)
     if response.status_code != 201:
         raise except_.BanficoResponse(response.status_code)
-    banficoConsent = command_.Banfico.consent(banficoAuth, financialId, response)
-    return banficoConsent
+    banficoConsentRequest = command_.Banfico.get_consent_request(banficoAuth, financialId, response)
+    return banficoConsentRequest
     
-def request_consent(banficoConsent):
-    response = command_.Banfico.request_consent(banficoConsent)
+def request_consent(banficoConsentRequest):
+    url = command_.Banfico.request_consent(banficoConsentRequest)
+    return url
     
-def authenticate_by_code(banficoAuth, code):
-    response = command_.Banfico.authenticate_by_code(banficoAuth, code)
+def authenticate_by_code(banficoConsentRequest, code):
+    response = command_.Banfico.authenticate_by_code(banficoConsentRequest, code)
     if response.status_code != 200:
         raise except_.BanficoResponse(response.status_code)
-    banficoAuth = command_.Banfico.bearer(banficoAuth,response)
-    return banficoAuth
+    banficoConsent = command_.Banfico.bearer_consent(banficoConsentRequest,response)
+    return banficoConsent
+
+def get_user_accounts(banficoConsent):
+    response = command_.Banfico.get_user_accounts(banficoConsent)
+    if response.status_code != 200:
+        raise except_.BanficoResponse(response.status_code)
+    return response.json()
+    

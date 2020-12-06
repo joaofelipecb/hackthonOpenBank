@@ -1,1 +1,2 @@
 from .BanficoAuthValid_ import BanficoAuthValid
+from .BanficoConsentValid_ import BanficoConsentValid

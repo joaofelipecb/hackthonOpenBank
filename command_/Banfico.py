@@ -1,5 +1,7 @@
 import requests
 import base64
+import json
+import datetime
 import develop_
 
 def authenticate(banficoAuth):
@@ -15,5 +17,21 @@ def authenticate(banficoAuth):
     
 def bearer(banficoAuth, response):
     json = response.json()
-    print(json['access_token'])
     return develop_.BanficoAuthValid(banficoAuth.clientId,banficoAuth.clientSecret,json['access_token'])
+
+def create_access_consents(banficoAuth, financialId, permissions):
+    url = 'https://gw-dev.obiebank.banfico.com/obie-aisp/v3.1/aisp/account-access-consents'
+    bearer = 'Bearer ' + banficoAuth.bearer
+    headers = {'x-fapi-financial-id':financialId, 'Authorization':bearer, 'Content-Type': 'application/json; charset=utf-8'}
+    data = {'Permissions':permissions,
+            'ExpirationDateTime':(datetime.datetime.now() + datetime.timedelta(days=1)).astimezone(datetime.timezone.utc).isoformat(timespec='milliseconds'),
+            'TransactionFromDateTime':datetime.datetime.now().astimezone(datetime.timezone.utc).isoformat(timespec='milliseconds'),
+            'TransactionToDateTime':datetime.datetime.now().astimezone(datetime.timezone.utc).isoformat(timespec='milliseconds')}
+    payload = {'Data':data,'Risk':{}}
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    return response
+    
+def consent(banficoAuth, response):
+    json = response.json()
+    return develop_.BanficoConsentValid(banficoAuth,json['Data']['ConsentId'])
+    

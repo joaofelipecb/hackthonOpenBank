@@ -1,7 +1,7 @@
 class BanficoAuth:
-    def __init__(self, client_id, client_secret, bearer=None):
-        self.__clientId = client_id;
-        self.__clientSecret = client_secret;
+    def __init__(self, clientId, clientSecret, bearer=None):
+        self.__clientId = clientId;
+        self.__clientSecret = clientSecret;
         self.__bearer = bearer
         
     @property
@@ -12,3 +12,6 @@ class BanficoAuth:
     def clientSecret(self):
         return self.__clientSecret
 
+    @property
+    def bearer(self):
+        return self.__bearer

@@ -1,0 +1,3 @@
+class BanficoResponse (Exception):
+    pass
+    

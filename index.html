@@ -1,8 +1,20 @@
 <html>
 <head>
 <title>GeoCredit</title>
+<script src="command_/Maps.js"></script>
+<script src="struct_/Maps.js"></script>
 </head>
 <body>
-
+<div style="z-index:10;position:absolute;">
+<a href="">Carregar dados de entregas</a> &gt;
+<a href="">Fazer an&aacute;lise</a> &gt;
+<a href="">Carregar dados de pagamento</a> &gt;
+<a href="">Cruzar dados</a> &gt;
+<a href="">Buscar Oferta de Cr&eacute;dito</a>
+</div>
+<img src="mapa1.jpg" id="map">
+<script>
+map = new structMaps(document.getElementById('map'),980,392);
+</script>
 </body>
 </html>

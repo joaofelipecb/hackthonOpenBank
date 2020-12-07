@@ -1,0 +1,5 @@
+from .BanficoAuthValid_ import BanficoAuthValid
+from .BanficoConsentRequestValid_ import BanficoConsentRequestValid
+from .BanficoConsentValid_ import BanficoConsentValid
+from .BanficoAccountValid_ import BanficoAccountValid
+from .BanficoTransactionValid_ import BanficoTransactionValid
